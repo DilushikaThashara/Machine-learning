@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Failure Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 4px;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <h1>Heart Failure Prediction</h1>
+    <form id="predictionForm">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+
+        <label for="anaemia">Anaemia (1 = Yes, 0 = No):</label>
+        <input type="number" id="anaemia" name="anaemia" required><br><br>
+
+        <label for="creatinine_phosphokinase">Creatinine Phosphokinase:</label>
+        <input type="number" id="creatinine_phosphokinase" name="creatinine_phosphokinase" required><br><br>
+
+        <label for="diabetes">Diabetes (1 = Yes, 0 = No):</label>
+        <input type="number" id="diabetes" name="diabetes" required><br><br>
+
+        <label for="ejection_fraction">Ejection Fraction:</label>
+        <input type="number" id="ejection_fraction" name="ejection_fraction" required><br><br>
+
+        <label for="high_blood_pressure">High Blood Pressure (1 = Yes, 0 = No):</label>
+        <input type="number" id="high_blood_pressure" name="high_blood_pressure" required><br><br>
+
+        <label for="platelets">Platelets:</label>
+        <input type="number" id="platelets" name="platelets" required><br><br>
+
+        <label for="serum_creatinine">Serum Creatinine:</label>
+        <input type="number" step="0.1" id="serum_creatinine" name="serum_creatinine" required><br><br>
+
+        <label for="serum_sodium">Serum Sodium:</label>
+        <input type="number" id="serum_sodium" name="serum_sodium" required><br><br>
+
+        <label for="sex">Sex (1 = Male, 0 = Female):</label>
+        <input type="number" id="sex" name="sex" required><br><br>
+
+        <label for="smoking">Smoking (1 = Yes, 0 = No):</label>
+        <input type="number" id="smoking" name="smoking" required><br><br>
+
+        <label for="time">Time (Follow-up Period):</label>
+        <input type="number" id="time" name="time" required><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <h2>Prediction Result:</h2>
+    <p id="result"></p>
+
+    <script>
+        // Handle form submission
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const inputData = {
+                features: [
+                    parseFloat(formData.get('age')),
+                    parseInt(formData.get('anaemia')),
+                    parseFloat(formData.get('creatinine_phosphokinase')),
+                    parseInt(formData.get('diabetes')),
+                    parseFloat(formData.get('ejection_fraction')),
+                    parseInt(formData.get('high_blood_pressure')),
+                    parseFloat(formData.get('platelets')),
+                    parseFloat(formData.get('serum_creatinine')),
+                    parseFloat(formData.get('serum_sodium')),
+                    parseInt(formData.get('sex')),
+                    parseInt(formData.get('smoking')),
+                    parseFloat(formData.get('time'))
+                ]
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(inputData)
+                });
+                const result = await response.json();
+                if (result.prediction !== undefined) {
+                    document.getElementById('result').innerText = `Prediction: ${result.prediction === 1 ? 'At Risk' : 'Not At Risk'}`;
+                } else {
+                    document.getElementById('result').innerText = `Error: ${result.error || 'Unknown error'}`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
